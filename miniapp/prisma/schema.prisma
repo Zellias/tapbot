@@ -1,0 +1,72 @@
+generator client {
+    provider = "prisma-client-js"
+}
+
+datasource db {
+    provider = "sqlite"
+    url      = "file:./dev.db"
+}
+
+model User {
+    id                  Int         @id @default(autoincrement())
+    name                String?
+    score               Int         @default(0)
+    avatar              String?
+    lastSpin            DateTime?
+    createdAt           DateTime    @default(now())
+    updatedAt           DateTime    @updatedAt
+    referralsAsReferrer Refferal[]  @relation("referrer")
+    referralsAsReferred Refferal[]  @relation("referred")
+    DoneTasks           DoneTasks[]
+    Payment             Payment[]
+}
+
+model Payment {
+    id        Int      @id @default(autoincrement())
+    userId    Int
+    user      User     @relation(fields: [userId], references: [id])
+    amount    Int
+    status    String
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+}
+
+model Refferal {
+    id          Int      @id @default(autoincrement())
+    refererId   Int
+    referedId   Int
+    referedUser User     @relation("referred", fields: [referedId], references: [id])
+    refererUser User     @relation("referrer", fields: [refererId], references: [id])
+    createdAt   DateTime @default(now())
+    updatedAt   DateTime @updatedAt
+}
+
+model Tasks {
+    id          Int         @id @default(autoincrement())
+    title       String
+    description String
+    reward      Int
+    link        String
+    type        String @default("channel")
+    value       String @default("none")
+    createdAt   DateTime    @default(now())
+    updatedAt   DateTime    @updatedAt
+    DoneTasks   DoneTasks[]
+}
+
+model DoneTasks {
+    id        Int      @id @default(autoincrement())
+    userId    Int
+    user      User     @relation(fields: [userId], references: [id])
+    taskId    Int
+    task      Tasks    @relation(fields: [taskId], references: [id])
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+}
+model Otp {
+    id        Int      @id @default(autoincrement())
+    otp       String
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+}
